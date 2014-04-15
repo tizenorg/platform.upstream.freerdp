@@ -1,3 +1,5 @@
+%bcond_with x
+
 Name:           freerdp
 Version:        1.0.2
 Release:        0
@@ -10,6 +12,7 @@ Source0:        http://pub.freerdp.com/releases/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  cups-devel
 BuildRequires:  desktop-file-utils
+%if %{with x}
 BuildRequires:  libX11-devel
 BuildRequires:  libXcursor-devel
 BuildRequires:  libXdamage-devel
@@ -17,6 +20,8 @@ BuildRequires:  libXext-devel
 BuildRequires:  libXinerama-devel
 BuildRequires:  libXv-devel
 BuildRequires:  libxkbfile-devel
+%endif
+
 BuildRequires:  openssl-devel
 BuildRequires:  pkgconfig(libpulse)
 BuildRequires:  xmlto
@@ -80,12 +85,21 @@ EOF
         -DWITH_CUPS=ON \
         -DWITH_PCSC=OFF \
         -DWITH_PULSEAUDIO=ON \
+%if %{with x}
         -DWITH_X11=ON \
         -DWITH_XCURSOR=ON \
         -DWITH_XEXT=ON \
         -DWITH_XINERAMA=ON \
         -DWITH_XKBFILE=ON \
         -DWITH_XV=ON \
+%else
+        -DWITH_X11=OFF \
+        -DWITH_XCURSOR=OFF \
+        -DWITH_XEXT=OFF \
+        -DWITH_XINERAMA=OFF \
+        -DWITH_XKBFILE=OFF \
+        -DWITH_XV=OFF \
+%endif
         -DWITH_ALSA=OFF \
         -DWITH_CUNIT=OFF \
         -DWITH_DIRECTFB=OFF \
@@ -132,9 +146,14 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 
 %files
+%if %{with x}
 %{_bindir}/xfreerdp
 %{_mandir}/man1/xfreerdp.*
 %{_datadir}/applications/xfreerdp.desktop
+%else
+%exclude %{_datadir}/applications/xfreerdp.desktop
+%endif
+
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 %{_datadir}/%{name}/keymaps/*
 
