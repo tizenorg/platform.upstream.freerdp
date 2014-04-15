@@ -1,7 +1,7 @@
 %bcond_with x
 
 Name:           freerdp
-Version:        1.0.2
+Version:        1.1.0+beta+2013071101
 Release:        0
 Summary:        Remote Desktop Protocol client
 Group:          Group: Applications/Other
@@ -124,7 +124,7 @@ EOF
         -DCMAKE_INSTALL_LIBDIR:PATH=%{_lib} \
         .
 
-make %{?_smp_mflags}
+make %{?_smp_mflags} V=1
 
 
 %install
@@ -133,6 +133,7 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL='install -p'
 desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications xfreerdp.desktop
 install -p -m 644 -D resources/FreeRDP_Icon_256px.png $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
+rm -f %{buildroot}/%{_libdir}/*.a
 
 %post
 # This is no gtk application, but try to integrate nicely with GNOME if it is available
@@ -155,15 +156,13 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %endif
 
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
-%{_datadir}/%{name}/keymaps/*
 
 
 %files libs
-%{_libdir}/lib%{name}-*.so.*
-%{_libdir}/%{name}/*.so
+%{_libdir}/lib*.so.*
 
 
 %files devel
-%{_includedir}/%{name}/
+%{_includedir}/*/*
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/%{name}.pc
