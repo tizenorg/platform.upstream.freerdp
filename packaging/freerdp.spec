@@ -1,4 +1,4 @@
-%bcond_with wayland
+%bcond_with x
 
 Name:           freerdp
 Version:        1.1.0
@@ -16,9 +16,18 @@ BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(openssl)
 BuildRequires:  pkgconfig(alsa)
-
-%if !%{with wayland}
-ExclusiveArch:
+%if %{with x}
+BuildRequires:  pkgconfig(x11)
+BuildRequires:  pkgconfig(xcursor)
+BuildRequires:  pkgconfig(xdamage)
+BuildRequires:  pkgconfig(xext)
+BuildRequires:  pkgconfig(xi)
+BuildRequires:  pkgconfig(xinerama)
+BuildRequires:  pkgconfig(xkbfile)
+BuildRequires:  pkgconfig(xrandr)
+BuildRequires:  pkgconfig(xrender)
+BuildRequires:  pkgconfig(xtst)
+BuildRequires:  pkgconfig(xv)
 %endif
 
 %description
@@ -40,8 +49,13 @@ cp %{SOURCE1} .
 %build
 cmake \
         -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+%if %{with x}
+        -DWITH_X11:BOOL=ON \
+        -DWITH_CLIENT:BOOL=ON \
+%else
         -DWITH_X11:BOOL=OFF \
         -DWITH_CLIENT:BOOL=OFF \
+%endif
         -DWITH_SERVER:BOOL=ON \
         -DWITH_ALSA:BOOL=ON \
         -DWITH_SSE2:BOOL=OFF \
@@ -64,6 +78,10 @@ install -m 644 -p -D winpr/include/winpr/config.h $RPM_BUILD_ROOT%{_includedir}/
 %manifest %{name}.manifest
 %defattr(-,root,root)
 %license LICENSE
+%if %{with x}
+%{_bindir}/xfreerdp
+%{_bindir}/xfreerdp-server
+%endif
 %{_bindir}/winpr-makecert
 %{_libdir}/lib*.so.*
 
