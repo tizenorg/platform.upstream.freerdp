@@ -56,6 +56,9 @@ cmake \
         -DWITH_X11:BOOL=OFF \
         -DWITH_CLIENT:BOOL=OFF \
 %endif
+%ifarch aarch64
+        -DWITH_NEON:BOOL=OFF \
+%endif
         -DWITH_SERVER:BOOL=ON \
         -DWITH_ALSA:BOOL=ON \
         -DWITH_SSE2:BOOL=OFF \
