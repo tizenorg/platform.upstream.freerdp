@@ -62,6 +62,7 @@ cmake \
         -DWITH_SERVER:BOOL=ON \
         -DWITH_ALSA:BOOL=ON \
         -DWITH_SSE2:BOOL=OFF \
+        -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON \
         .
 make %{?_smp_mflags}
 
