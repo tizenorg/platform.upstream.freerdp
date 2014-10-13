@@ -1,4 +1,5 @@
 %bcond_with x
+%bcond_with wayland
 
 Name:           freerdp
 Version:        1.1.0
@@ -16,6 +17,9 @@ BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(openssl)
 BuildRequires:  pkgconfig(alsa)
+%if %{with wayland}
+BuildRequires:  pkgconfig(wayland-client)
+%endif
 %if %{with x}
 BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(xcursor)
@@ -49,12 +53,16 @@ cp %{SOURCE1} .
 %build
 cmake \
         -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+        -DWITH_CLIENT:BOOL=ON \
+%if %{with wayland}
+        -DWITH_WAYLAND:BOOL=ON \
+%else
+        -DWITH_WAYLAND:BOOL=OFF \
+%endif
 %if %{with x}
         -DWITH_X11:BOOL=ON \
-        -DWITH_CLIENT:BOOL=ON \
 %else
         -DWITH_X11:BOOL=OFF \
-        -DWITH_CLIENT:BOOL=OFF \
 %endif
 %ifarch aarch64
         -DWITH_NEON:BOOL=OFF \
@@ -82,6 +90,9 @@ install -m 644 -p -D winpr/include/winpr/config.h $RPM_BUILD_ROOT%{_includedir}/
 %manifest %{name}.manifest
 %defattr(-,root,root)
 %license LICENSE
+%if %{with wayland}
+%{_bindir}/wlfreerdp
+%endif
 %if %{with x}
 %{_bindir}/xfreerdp
 %{_bindir}/xfreerdp-server
