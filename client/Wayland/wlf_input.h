@@ -15,7 +15,7 @@ struct wlf_input
 	struct wl_keyboard *keyboard;
 };
 
-void wlf_InitInput(wlfContext* wlfc, rdpInput* input);
-void wlf_CloseInput(wlfContext* wlfc);
+wlfInput* wlf_CreateInput(wlfContext* wlfc);
+void wlf_DestroyInput(wlfContext* wlfc, wlfInput* input);
 
 #endif /* __WLF_INPUT_H */

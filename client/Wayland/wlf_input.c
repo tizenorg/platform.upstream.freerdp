@@ -14,12 +14,12 @@ static void wl_pointer_leave(void* data, struct wl_pointer* pointer, uint32_t se
 
 static void wl_pointer_motion(void* data, struct wl_pointer* pointer, uint32_t time, wl_fixed_t sx_w, wl_fixed_t sy_w)
 {
-	wlfContext* context = data;
+	wlfInput* input_w = data;
 	rdpInput* input;
 	UINT16 x;
 	UINT16 y;
 
-	input = context->input->input;
+	input = input_w->input;
 
 	x = wl_fixed_to_int(sx_w);
 	y = wl_fixed_to_int(sy_w);
@@ -29,11 +29,11 @@ static void wl_pointer_motion(void* data, struct wl_pointer* pointer, uint32_t t
 
 static void wl_pointer_button(void* data, struct wl_pointer* pointer, uint32_t serial, uint32_t time, uint32_t button, uint32_t state)
 {
-	wlfContext* context = data;
+	wlfInput* input_w = data;
 	rdpInput* input;
 	int flags;
 
-	input = context->input->input;
+	input = input_w->input;
 
 	if (state == WL_POINTER_BUTTON_STATE_PRESSED)
 		flags = PTR_FLAGS_DOWN;
@@ -67,16 +67,15 @@ static const struct wl_pointer_listener wl_pointer_listener =
 
 static void wl_seat_handle_capabilities(void* data, struct wl_seat* seat, enum wl_seat_capability capabilities)
 {
-	wlfContext* context = data;
+	wlfInput* input = data;
 	struct wl_pointer* pointer;
-	struct wl_pointer* keyboard;
 
 	if (capabilities & WL_SEAT_CAPABILITY_POINTER)
 	{
 		pointer = wl_seat_get_pointer(seat);
 
-		context->input->pointer = pointer;
-		wl_pointer_add_listener(pointer, &wl_pointer_listener, context);
+		input->pointer = pointer;
+		wl_pointer_add_listener(pointer, &wl_pointer_listener, input);
 	}
 }
 
@@ -85,33 +84,42 @@ static const struct wl_seat_listener wl_seat_listener = {
 };
 
 
-void wlf_InitInput(wlfContext* wlfc, rdpInput* input)
+wlfInput* wlf_CreateInput(wlfContext* wlfc)
 {
-	wlfInput *input_w;
-	struct wl_seat *seat;
+	wlfInput* input;
+	struct wl_seat* seat;
 
+	if (!wlfc->display)
+		return NULL;
 	if (!wlfc->display->seat)
-		return;
-
+		return NULL;
 	seat = wlfc->display->seat;
 
-	input_w = (wlfInput*) malloc(sizeof(wlfInput));
-	ZeroMemory(input_w, sizeof(wlfInput));
+	input = (wlfInput*) malloc(sizeof(wlfInput));
+	ZeroMemory(input, sizeof(wlfInput));
 
-	input_w->input = input;
-	wlfc->input = input_w;
+	if (input)
+	{
+		input->input = wlfc->context.input;
 
-	wl_seat_add_listener(seat, &wl_seat_listener, wlfc);
+		wl_seat_add_listener(seat, &wl_seat_listener, input);
+	}
+
+	return input;
 }
 
-void wlf_CloseInput(wlfContext* wlfc)
+void wlf_DestroyInput(wlfContext* wlfc, wlfInput* input)
 {
-	if (!wlfc->input)
+	if (input == NULL)
 		return;
 
-	if (wlfc->input->pointer)
-		wl_pointer_release(wlfc->input->pointer);
+	if (wlfc->input == input)
+		wlfc->input = NULL;
 
-	free(wlfc->input);
-	wlfc->input = NULL;
+	if (input->pointer)
+		wl_pointer_release(input->pointer);
+	if (input->keyboard)
+		wl_keyboard_release(input->keyboard);
+
+	free(input);
 }

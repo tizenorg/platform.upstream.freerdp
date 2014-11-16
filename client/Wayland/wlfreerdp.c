@@ -69,6 +69,7 @@ void wl_end_paint(rdpContext* context)
 BOOL wl_pre_connect(freerdp* instance)
 {
 	wlfDisplay* display;
+	wlfInput* input;
 	wlfContext* context;
 
 	freerdp_channels_pre_connect(instance->context->channels, instance);
@@ -78,7 +79,8 @@ BOOL wl_pre_connect(freerdp* instance)
 	display = wlf_CreateDisplay();
 	context->display = display;
 
-	wlf_InitInput(context, instance->context->input);
+	input = wlf_CreateInput(context);
+	context->input = input;
 
 	return TRUE;
 }
@@ -227,8 +229,8 @@ int wlfreerdp_run(freerdp* instance)
 	wlfContext* context;
 
 	context = (wlfContext*) instance->context;
-	wlf_CloseInput(context);
 	wlf_DestroyWindow(context, context->window);
+	wlf_DestroyInput(context, context->input);
 	wlf_DestroyDisplay(context, context->display);
 
 	freerdp_channels_close(instance->context->channels, instance);
