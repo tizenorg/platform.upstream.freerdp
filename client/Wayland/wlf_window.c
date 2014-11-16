@@ -132,7 +132,6 @@ wlfWindow* wlf_CreateDesktopWindow(wlfContext* wlfc, char* name, int width, int 
 
 void wlf_ResizeDesktopWindow(wlfContext* wlfc, wlfWindow* window, int width, int height)
 {
-	// MINIMAL WIDTH + HEIGHT !!!
 	window->width = width;
 	window->height = height;
 }

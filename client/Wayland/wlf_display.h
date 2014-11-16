@@ -14,6 +14,7 @@ struct wlf_display
 	struct wl_compositor* compositor;
 	struct wl_shell* shell;
 	struct wl_shm* shm;
+	struct wl_seat* seat;
 };
 
 wlfDisplay* wlf_CreateDisplay(void);

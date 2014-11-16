@@ -8,7 +8,7 @@ typedef struct wlf_context wlfContext;
 
 #include "wlf_display.h"
 #include "wlf_window.h"
-//#include "wlf_input.h"
+#include "wlf_input.h"
 
 struct wlf_context
 {
@@ -16,7 +16,7 @@ struct wlf_context
 
 	wlfDisplay* display;
 	wlfWindow* window;
-	//wlfPointer* pointer;
+	wlfInput* input;
 };
 
 #endif /* __WLFREERDP_H */

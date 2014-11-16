@@ -25,8 +25,8 @@ set(${MODULE_PREFIX}_SRCS
 	wlf_display.h
 	wlf_window.c
 	wlf_window.h
-#	wlf_input.c
-#	wlf_input.h
+	wlf_input.c
+	wlf_input.h
 	wlfreerdp.c
 	wlfreerdp.h)
 

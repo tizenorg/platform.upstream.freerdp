@@ -73,9 +73,12 @@ BOOL wl_pre_connect(freerdp* instance)
 
 	freerdp_channels_pre_connect(instance->context->channels, instance);
 
-	display = wlf_CreateDisplay();
 	context = (wlfContext*) instance->context;
+
+	display = wlf_CreateDisplay();
 	context->display = display;
+
+	wlf_InitInput(context, instance->context->input);
 
 	return TRUE;
 }
@@ -224,6 +227,7 @@ int wlfreerdp_run(freerdp* instance)
 	wlfContext* context;
 
 	context = (wlfContext*) instance->context;
+	wlf_CloseInput(context);
 	wlf_DestroyWindow(context, context->window);
 	wlf_DestroyDisplay(context, context->display);
 

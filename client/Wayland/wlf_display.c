@@ -9,9 +9,11 @@ static void wl_registry_handle_global(void* data, struct wl_registry* registry, 
 	if (strcmp(interface, "wl_compositor") == 0)
 		display->compositor = wl_registry_bind(registry, id, &wl_compositor_interface, 1);
 	else if (strcmp(interface, "wl_shell") == 0)
-		 display->shell = wl_registry_bind(registry, id, &wl_shell_interface, 1);
-	 else if (strcmp(interface, "wl_shm") == 0)
-		 display->shm = wl_registry_bind(registry, id, &wl_shm_interface, 1);
+		display->shell = wl_registry_bind(registry, id, &wl_shell_interface, 1);
+	else if (strcmp(interface, "wl_shm") == 0)
+		display->shm = wl_registry_bind(registry, id, &wl_shm_interface, 1);
+	else if (strcmp(interface, "wl_seat") == 0)
+		display->seat = wl_registry_bind(registry, id, &wl_seat_interface, 1);
 }
 
 static void wl_registry_handle_global_remove(void* data, struct wl_registry* registry, uint32_t name)
@@ -73,6 +75,8 @@ void wlf_DestroyDisplay(wlfContext* wlfc, wlfDisplay* display)
 	if (wlfc->display == display)
 		wlfc->display = NULL;
 
+	if (display->seat)
+		wl_seat_destroy(display->seat);
 	if (display->shm)
 		wl_shm_destroy(display->shm);
 	if (display->shell)
