@@ -1,5 +1,7 @@
 #include <linux/input.h>
 
+#include <freerdp/locale/keyboard.h>
+
 #include "wlf_input.h"
 
 static void wl_pointer_enter(void* data, struct wl_pointer* pointer, uint32_t serial, struct wl_surface* surface, wl_fixed_t sx_w, wl_fixed_t sy_w)
@@ -65,10 +67,64 @@ static const struct wl_pointer_listener wl_pointer_listener =
 	NULL
 };
 
+static void wl_keyboard_keymap(void* data, struct wl_keyboard* keyboard, uint32_t format, int fd, uint32_t size)
+{
+
+}
+
+static void wl_keyboard_enter(void* data, struct wl_keyboard* keyboard, uint32_t serial, struct wl_surface* surface, struct wl_array* keys)
+{
+
+}
+
+static void wl_keyboard_leave(void* data, struct wl_keyboard* keyboard, uint32_t serial, struct wl_surface* surface)
+{
+
+}
+
+static void wl_keyboard_key(void* data, struct wl_keyboard* keyboard, uint32_t serial, uint32_t time, uint32_t key, uint32_t state)
+{
+	wlfInput* input_w = data;
+	rdpInput* input;
+	BOOL key_down;
+	//BYTE keycode;
+	DWORD rdp_scancode;
+
+	input = input_w->input;
+
+	if (state == WL_KEYBOARD_KEY_STATE_PRESSED)
+		key_down = TRUE;
+	else
+		key_down = FALSE;
+
+	rdp_scancode = freerdp_keyboard_get_rdp_scancode_from_x11_keycode(key);
+
+	if (rdp_scancode == RDP_SCANCODE_UNKNOWN)
+		return;
+
+	freerdp_input_send_keyboard_event_ex(input, key_down, rdp_scancode);
+}
+
+static void wl_keyboard_modifiers(void* data, struct wl_keyboard* keyboard, uint32_t serial, uint32_t mods_depr, uint32_t mods_latch, uint32_t mods_lock, uint32_t group)
+{
+
+}
+
+static const struct wl_keyboard_listener wl_keyboard_listener =
+{
+	wl_keyboard_keymap,
+	wl_keyboard_enter,
+	wl_keyboard_leave,
+	wl_keyboard_key,
+	wl_keyboard_modifiers,
+	NULL
+};
+
 static void wl_seat_handle_capabilities(void* data, struct wl_seat* seat, enum wl_seat_capability capabilities)
 {
 	wlfInput* input = data;
 	struct wl_pointer* pointer;
+	struct wl_keyboard* keyboard;
 
 	if (capabilities & WL_SEAT_CAPABILITY_POINTER)
 	{
@@ -77,6 +133,15 @@ static void wl_seat_handle_capabilities(void* data, struct wl_seat* seat, enum w
 		input->pointer = pointer;
 		wl_pointer_add_listener(pointer, &wl_pointer_listener, input);
 	}
+
+	if (capabilities & WL_SEAT_CAPABILITY_KEYBOARD)
+	{
+		keyboard = wl_seat_get_keyboard(seat);
+
+		input->keyboard = keyboard;
+		wl_keyboard_add_listener(keyboard, &wl_keyboard_listener, input);
+	}
+
 }
 
 static const struct wl_seat_listener wl_seat_listener = {
