@@ -48,6 +48,7 @@ void wl_begin_paint(rdpContext* context)
 
 void wl_end_paint(rdpContext* context)
 {
+	char *data;
 	rdpGdi* gdi;
 	wlfDisplay* display;
 	wlfWindow* window;
@@ -61,7 +62,7 @@ void wl_end_paint(rdpContext* context)
 	display = context_w->display;
 	window = context_w->window;
 
-	data = realloc(window->data, gdi->width * gdi->height * 4));
+	data = realloc(window->data, gdi->width * gdi->height * 4);
 
 	if (!data)
 	{
