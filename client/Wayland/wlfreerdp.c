@@ -1,6 +1,6 @@
 /**
  * FreeRDP: A Remote Desktop Protocol Implementation
- * Wayland Client Interface
+ * Wayland Client
  *
  * Copyright 2014 Manuel Bachmann <tarnyko@tarnyko.net>
  *

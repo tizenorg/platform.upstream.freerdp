@@ -1,3 +1,22 @@
+/**
+ * FreeRDP: A Remote Desktop Protocol Implementation
+ * Wayland Input
+ *
+ * Copyright 2014 Manuel Bachmann <tarnyko@tarnyko.net>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include <linux/input.h>
 
 #include <freerdp/locale/keyboard.h>
@@ -87,7 +106,6 @@ static void wl_keyboard_key(void* data, struct wl_keyboard* keyboard, uint32_t s
 	wlfInput* input_w = data;
 	rdpInput* input;
 	BOOL key_down;
-	//BYTE keycode;
 	DWORD rdp_scancode;
 
 	input = input_w->input;
@@ -116,8 +134,7 @@ static const struct wl_keyboard_listener wl_keyboard_listener =
 	wl_keyboard_enter,
 	wl_keyboard_leave,
 	wl_keyboard_key,
-	wl_keyboard_modifiers,
-	NULL
+	wl_keyboard_modifiers
 };
 
 static void wl_seat_handle_capabilities(void* data, struct wl_seat* seat, enum wl_seat_capability capabilities)
