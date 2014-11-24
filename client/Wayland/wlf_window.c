@@ -64,6 +64,7 @@ static void wl_callback_done(void* data, struct wl_callback* callback, uint32_t 
 	wlfBuffer* buffer;
 	struct wl_shm_pool* shm_pool;
 	void* shm_data;
+	void* free_data;
 	int fd;
 	int fdt;
 
@@ -98,7 +99,9 @@ static void wl_callback_done(void* data, struct wl_callback* callback, uint32_t 
 	shm_unlink("wlfreerdp_shm");
 	close(fd);
 
+	free_data = buffer->shm_data;
 	buffer->shm_data = shm_data;
+	munmap(free_data, window->width * window->height * 4);
 
 	 /* this is the real surface data */
 	memcpy(buffer->shm_data, (void*) window->data, window->width * window->height * 4);
@@ -111,7 +114,6 @@ static void wl_callback_done(void* data, struct wl_callback* callback, uint32_t 
 	wl_surface_commit(window->surface);
 
 	buffer->busy = TRUE;
-	munmap(buffer->shm_data, window->width * window->height * 4);
 }
 
 static const struct wl_callback_listener wl_callback_listener =
