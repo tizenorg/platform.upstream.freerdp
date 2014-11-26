@@ -70,10 +70,11 @@ void wl_end_paint(rdpContext* context)
 	display = context_w->display;
 	window = context_w->window;
 
-	for (i = 0; i < h; i++)
-		memcpy(window->data + (((i+y)*w)*4) + x*4,
-		       gdi->primary_buffer + (((i+y)*w)*4) + x*4,
+	for (i = 0; i < h; i++) {
+		memcpy(window->data + ((i+y)*(gdi->width*4)) + x*4,
+		       gdi->primary_buffer + ((i+y)*(gdi->width*4)) + x*4,
 		       w*4);
+	}
 
 	wlf_RefreshDisplay(display);
 }
