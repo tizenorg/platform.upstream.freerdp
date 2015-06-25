@@ -1,14 +1,16 @@
 %bcond_with x
+%bcond_with wayland
 
 Name:           freerdp
-Version:        1.1.0+beta+2013071101
+Version:        1.2.0+beta1+android9
 Release:        0
 Summary:        Remote Desktop Protocol client
-Group:          Group: Applications/Other
+Group:          Graphics & UI Framework/Development
 
 License:        Apache-2.0
 URL:            http://www.freerdp.com/
 Source0:        http://pub.freerdp.com/releases/%{name}-%{version}.tar.gz
+Source1: 	freerdp.manifest
 BuildRequires:  cmake
 BuildRequires:  cups-devel
 BuildRequires:  desktop-file-utils
@@ -21,6 +23,10 @@ BuildRequires:  libXinerama-devel
 BuildRequires:  libXv-devel
 BuildRequires:  libxkbfile-devel
 %endif
+%if !%{with wayland}
+BuildRequires:  packageconfig(wayland)
+%endif
+
 
 BuildRequires:  openssl-devel
 BuildRequires:  pkgconfig(libpulse)
@@ -64,8 +70,10 @@ developing applications that use %{name} libs.
 
 %prep
 
-%setup -q -n freerdp-1.1.0-beta+2013071101
+%setup -q
+cp %{SOURCE1} .
 
+%if %{with x}
 cat << EOF > xfreerdp.desktop
 [Desktop Entry]
 Type=Application
@@ -77,6 +85,7 @@ Exec=/usr/bin/xfreerdp
 Terminal=false
 Categories=Network;RemoteAccess;
 EOF
+%endif
 
 
 %build
@@ -124,16 +133,16 @@ EOF
         -DCMAKE_INSTALL_LIBDIR:PATH=%{_lib} \
         .
 
-make %{?_smp_mflags} V=1
+make %{?_smp_mflags}
 
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL='install -p'
+%make_install
 
+%if %{with x}
 desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications xfreerdp.desktop
 install -p -m 644 -D resources/FreeRDP_Icon_256px.png $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/256x256/apps/%{name}.png
-
-rm -f %{buildroot}/%{_libdir}/*.a
+%endif
 
 %post
 # This is no gtk application, but try to integrate nicely with GNOME if it is available
@@ -147,22 +156,27 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 
 %files
+%manifest %{name}.manifest
+%license LICENSE
 %if %{with x}
 %{_bindir}/xfreerdp
 %{_mandir}/man1/xfreerdp.*
 %{_datadir}/applications/xfreerdp.desktop
-%else
-%exclude %{_datadir}/applications/xfreerdp.desktop
+%{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 %endif
 
-%{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 
 %files libs
+%license LICENSE
+%manifest %{name}.manifest
 %{_libdir}/lib*.so.*
 
 
 %files devel
+%license LICENSE
+%manifest %{name}.manifest
 %{_includedir}/*/*
 %{_libdir}/lib*.so
-%{_libdir}/pkgconfig/%{name}.pc
+%{_libdir}/pkgconfig/*.pc
+%{_libdir}/cmake/*/*.cmake
